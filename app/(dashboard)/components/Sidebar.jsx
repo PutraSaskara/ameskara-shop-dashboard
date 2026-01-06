@@ -72,7 +72,7 @@ export default function Sidebar() {
 
             {/* --- SIDEBAR UTAMA --- */}
             <aside className={`
-                fixed top-0 left-0 z-30 h-full w-64 bg-gray-900 text-white transition-transform duration-300 ease-in-out shadow-xl
+                fixed top-0 left-0 z-30 h-full w-64 bg-gray-900 text-white transition-transform duration-300 ease-in-out shadow-xl overflow-y-auto
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
                 md:translate-x-0 md:static md:h-screen
             `}>

@@ -3,7 +3,7 @@ import Sidebar from './components/Sidebar'; // Pastikan path import sesuai struk
 
 export default function DashboardLayout({ children }) {
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="flex h-screen overflow-hidden bg-gray-50">
             {/* Sidebar Component (Client) */}
             <Sidebar />
 

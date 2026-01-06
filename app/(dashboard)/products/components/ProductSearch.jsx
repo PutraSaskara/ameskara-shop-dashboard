@@ -40,7 +40,7 @@ export default function ProductSearch() {
   };
 
   return (
-    <form onSubmit={handleSearch} className="relative w-full sm:w-64">
+    <form onSubmit={handleSearch} className="relative w-full sm:w-64 text-black">
       <input
         type="text"
         placeholder="Cari produk..."
