@@ -36,10 +36,10 @@ async function getArticles(search = '', page = 1) {
 // Kita ubah file ini menjadi 'use client' agar bisa ambil token dari localStorage
 
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function ArticlesPage() {
+function ArticlesContent() {
     const [articles, setArticles] = useState([]);
     const [pagination, setPagination] = useState({});
     const [isLoading, setIsLoading] = useState(true);
@@ -144,7 +144,15 @@ export default function ArticlesPage() {
                                         <td className="px-6 py-4">
                                             <div className="relative w-16 h-12 bg-gray-100 rounded overflow-hidden border">
                                                 {article.thumbnail ? (
-                                                    <Image src={article.thumbnail} alt="thumb" fill className="object-cover" />
+                                                    <Image 
+                                                        src={article.thumbnail} 
+                                                        alt="thumb" 
+                                                        fill 
+                                                        className="object-cover"
+                                                        // Tambahkan unoptimized agar Next.js tidak mencoba fetch gambar di server (menghindari error ECONNREFUSED)
+                                                        unoptimized
+                                                        onError={(e) => { console.log("Gagal load gambar:", article.thumbnail) }}
+                                                    />
                                                 ) : (
                                                     <div className="flex items-center justify-center h-full text-gray-300">No Img</div>
                                                 )}
@@ -186,5 +194,13 @@ export default function ArticlesPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function ArticlesPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ArticlesContent />
+        </Suspense>
     );
 }

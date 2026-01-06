@@ -10,6 +10,12 @@ const nextConfig = {
         port: '5000', // PENTING: Tentukan port backend Anda
         pathname: '/uploads/**', // Izinkan akses ke semua path di bawah /uploads
       },
+      {
+        protocol: 'https',
+        hostname: 'ameskarabed.saskaraputra.my.id',
+        port: '', // Port kosong untuk HTTPS standar (443)
+        pathname: '/uploads/**',
+      },
       // Anda bisa menambahkan domain lain di sini jika ada CDN atau staging server
     ],
   },

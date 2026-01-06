@@ -9,14 +9,15 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
   
-  const API_URL = process.env.API_BASE_URL;
+  const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  // console.log('API_URL:', API_URL);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     
     try {
-      const res = await fetch(`http://localhost:5000/api/auth/login`, {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

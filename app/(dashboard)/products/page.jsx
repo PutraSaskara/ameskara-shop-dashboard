@@ -79,6 +79,9 @@ export default async function ProductsPage({ searchParams }) {
     ? categories.find(c => c.slug === categoryQuery)?.name 
     : null;
 
+    console.log('products:', products);
+    console.log('categories:', categories);
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       
