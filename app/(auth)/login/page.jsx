@@ -7,6 +7,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
     
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
@@ -41,6 +43,7 @@ export default function LoginPage() {
     } catch (err) {
       // Menangani error dengan lebih sederhana di JSX
       setError(err.message || 'Terjadi kesalahan tidak dikenal.');
+      setIsLoading(false);
     }
   };
 
@@ -74,9 +77,10 @@ export default function LoginPage() {
           </div>
           <button
             type="submit"
-            className="w-full rounded-md bg-indigo-600 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            disabled={isLoading}
+            className={`w-full rounded-md bg-indigo-600 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Login
+            {isLoading ? 'Memproses...' : 'Login'}
           </button>
         </form>
       </div>
