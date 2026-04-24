@@ -269,7 +269,12 @@ function ProductsContent() {
                                 )}
                             </button>
                             <div className="text-gray-400 hover:text-red-600 transition-colors">
-                                <DeleteButton productId={product.id} /> 
+                                <DeleteButton 
+                                    productId={product.id} 
+                                    onDeleteSuccess={() => {
+                                        setProducts(prev => prev.filter(p => p.id !== product.id));
+                                    }}
+                                /> 
                             </div>
                         </div>
                     </td>

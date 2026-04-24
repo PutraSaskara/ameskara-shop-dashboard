@@ -16,6 +16,7 @@ export default function ProductDetailClient({ product }) {
 
     // Cari data varian berdasarkan warna yang dipilih
     const currentVariant = product.variants.find(v => v.color === selectedColor);
+    const selectedSizeObj = currentVariant?.sizes?.find(s => s.size === selectedSize);
 
     // Handler saat Warna dipilih
     const handleColorSelect = (color, variantImage) => {
@@ -103,7 +104,7 @@ Mohon infokan ketersediaannya.`;
             <div className="flex flex-col">
                 <h1 className="text-3xl font-extrabold text-gray-900">{product.name}</h1>
                 <p className="text-2xl font-semibold text-indigo-600 mt-2">
-                    Rp {product.price.toLocaleString('id-ID')}
+                    Rp {selectedSizeObj?.price ? selectedSizeObj.price.toLocaleString('id-ID') : product.price.toLocaleString('id-ID')}
                 </p>
 
                 {/* Deskripsi */}

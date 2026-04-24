@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-export default function DeleteButton({ productId }) {
+export default function DeleteButton({ productId, onDeleteSuccess }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -40,8 +40,11 @@ export default function DeleteButton({ productId }) {
       }
 
       alert(`Produk ID ${productId} berhasil dihapus.`);
-      // Perintah penting di App Router: Memaksa Next.js untuk me-refresh Server Component
-      router.refresh(); 
+      if (onDeleteSuccess) {
+          onDeleteSuccess();
+      } else {
+          router.refresh(); 
+      }
       
     } catch (error) {
       alert(`Error: ${error.message || 'Gagal menghapus.'}`);

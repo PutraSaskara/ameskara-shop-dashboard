@@ -16,6 +16,12 @@ const nextConfig = {
         port: '', // Port kosong untuk HTTPS standar (443)
         pathname: '/uploads/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**',
+      },
       // Anda bisa menambahkan domain lain di sini jika ada CDN atau staging server
     ],
   },

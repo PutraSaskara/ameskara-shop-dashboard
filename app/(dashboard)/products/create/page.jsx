@@ -8,6 +8,7 @@ import Link from 'next/link';
 const initialSubVariant = {
     size: '',
     stock: 0,
+    price: '',
 };
 
 // Struktur Varian Utama (Warna, Gambar, dan array Ukuran)
@@ -66,7 +67,24 @@ export default function CreateProductPage() {
     // --- HANDLER UTAMA ---
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => {
+            const newData = { ...prev, [name]: value };
+            
+            if (name === 'name') {
+                const generateSlug = (text) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                const prevSlug = generateSlug(prev.name);
+                
+                if (!prev.slug || prev.slug === prevSlug) {
+                    newData.slug = generateSlug(value);
+                }
+                
+                if (!prev.meta_title || prev.meta_title === prev.name) {
+                    newData.meta_title = value;
+                }
+            }
+            
+            return newData;
+        });
     };
 
     // --- HANDLER BANNER UTAMA ---
@@ -222,6 +240,7 @@ export default function CreateProductPage() {
                 sizes: variant.sizes.map(s => ({
                     size: s.size,
                     stock: Number(s.stock),
+                    price: s.price ? Number(s.price) : undefined,
                 })),
             });
         });
@@ -278,7 +297,23 @@ export default function CreateProductPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6 text-black">
                 
-                {error && <div className="p-3 bg-red-100 text-red-700 rounded">{error}</div>}
+                {error && (
+                    <div className="flex items-start p-4 mb-6 text-red-800 border border-red-300 rounded-lg bg-red-50" role="alert">
+                        <svg className="flex-shrink-0 w-5 h-5 mt-0.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"/>
+                        </svg>
+                        <div className="ml-3 text-sm font-medium flex-1">
+                            <span className="block font-bold mb-1">Terjadi Kesalahan</span>
+                            {error}
+                        </div>
+                        <button type="button" onClick={() => setError(null)} className="ml-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 transition-colors" aria-label="Close">
+                            <span className="sr-only">Close</span>
+                            <svg className="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                            </svg>
+                        </button>
+                    </div>
+                )}
 
                 {/* --- BAGIAN DATA UTAMA --- */}
                 <div className="bg-white p-6 rounded-lg shadow space-y-4">
@@ -443,6 +478,14 @@ export default function CreateProductPage() {
                                         <label className="block text-xs font-medium text-gray-500">Stok Ukuran *</label>
                                         <input type="number" name="stock" value={subVariant.stock} 
                                             onChange={(e) => handleSubVariantChange(index, j, e)} required
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm" />
+                                    </div>
+
+                                    {/* Field Harga */}
+                                    <div className="flex-1">
+                                        <label className="block text-xs font-medium text-gray-500">Harga (Opsional)</label>
+                                        <input type="number" name="price" value={subVariant.price} 
+                                            onChange={(e) => handleSubVariantChange(index, j, e)}
                                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm" />
                                     </div>
 
