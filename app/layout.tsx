@@ -27,6 +27,8 @@ export const metadata = {
 };
 
 
+import { Toaster } from "react-hot-toast";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,7 +36,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <Toaster position="top-right" reverseOrder={false} />
+        {children}
+      </body>
     </html>
   );
 }

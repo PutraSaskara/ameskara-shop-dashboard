@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'; // Pastikan useEffect diimport
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from 'react-hot-toast';
 
 // Struktur Sub-varian (Ukuran)
 const initialSubVariant = {
@@ -41,6 +42,7 @@ export default function CreateProductPage() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [missingFields, setMissingFields] = useState([]); // State untuk field yang error
     const router = useRouter();
     
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -257,17 +259,23 @@ export default function CreateProductPage() {
                 body: data, 
             });
 
+            const result = await res.json();
+
             if (!res.ok) {
-                const result = await res.json();
+                // Simpan list field yang kosong jika ada dari backend
+                if (result.missingFields) {
+                    setMissingFields(result.missingFields);
+                }
                 throw new Error(result.message || 'Gagal menambahkan produk.');
             }
 
-            alert('Produk berhasil ditambahkan!');
+            toast.success('Produk berhasil ditambahkan!');
             router.refresh();
             router.push('/products'); 
 
         } catch (err) {
             setError(err.message || 'Terjadi kesalahan saat koneksi server.');
+            toast.error(err.message || 'Terjadi kesalahan server');
         } finally {
             setIsLoading(false);
         }
@@ -321,8 +329,15 @@ export default function CreateProductPage() {
                     
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Nama Produk *</label>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} required
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                        <input 
+                            type="text" 
+                            name="name" 
+                            value={formData.name} 
+                            onChange={handleChange} 
+                            required
+                            className={`mt-1 block w-full border ${missingFields.includes('name') ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-md shadow-sm p-2 transition-colors`} 
+                        />
+                        {missingFields.includes('name') && <p className="text-xs text-red-500 mt-1">Nama produk wajib diisi.</p>}
                     </div>
 
                     {/* --- ADDED: Input Kategori --- */}
@@ -356,8 +371,15 @@ export default function CreateProductPage() {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Harga (Rp) *</label>
-                            <input type="number" name="price" value={formData.price} onChange={handleChange} required
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                            <input 
+                                type="number" 
+                                name="price" 
+                                value={formData.price} 
+                                onChange={handleChange} 
+                                required
+                                className={`mt-1 block w-full border ${missingFields.includes('price') ? 'border-red-500 bg-red-50' : 'border-gray-300'} rounded-md shadow-sm p-2 transition-colors`} 
+                            />
+                            {missingFields.includes('price') && <p className="text-xs text-red-500 mt-1">Harga wajib diisi.</p>}
                         </div>
                     </div>
 
@@ -404,7 +426,7 @@ export default function CreateProductPage() {
                             accept=".webp" 
                             required 
                             onChange={handleBannerChange}
-                            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" 
+                            className={`mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold ${missingFields.includes('productBanner') ? 'file:bg-red-50 file:text-red-700' : 'file:bg-indigo-50 file:text-indigo-700'} hover:file:bg-indigo-100`} 
                         />
                         {formData.bannerImageFile && (
                             <p className="text-xs text-green-600 mt-1">File terpilih: {formData.bannerImageFile.name}</p>
@@ -507,9 +529,10 @@ export default function CreateProductPage() {
                     ))}
 
                     <button type="button" onClick={addVariant}
-                        className="mt-6 px-4 py-2 border border-dashed border-gray-400 text-gray-600 rounded-md w-full hover:bg-gray-50">
+                        className={`mt-6 px-4 py-2 border border-dashed ${missingFields.includes('variants') ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-400 text-gray-600'} rounded-md w-full hover:bg-gray-50 transition-colors`}>
                         + Tambah Varian Warna Lain
                     </button>
+                    {missingFields.includes('variants') && <p className="text-xs text-red-500 mt-2 text-center">Minimal harus ada satu varian produk.</p>}
                 </div>
 
                 {/* --- TOMBOL SUBMIT --- */}
