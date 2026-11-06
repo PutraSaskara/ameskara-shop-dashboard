@@ -6,8 +6,7 @@ import { notFound } from 'next/navigation';
 // Fungsi untuk mengambil data produk berdasarkan SLUG
 async function getProductDetail(slug) {
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-    const API_KEY = process.env.WEB_API_KEY; 
-
+    const API_KEY = process.env.WEB_API_KEY || process.env.NEXT_PUBLIC_WEB_API_KEY;
     console.log('data slug:', slug);
 
     // PENTING: Perkuat pengecekan slug

@@ -4,9 +4,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import toast from 'react-hot-toast';
 
 export default function CreateCategoryPage() {
     const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+    const [metaTitle, setMetaTitle] = useState('');
+    const [metaDescription, setMetaDescription] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const router = useRouter();
@@ -39,18 +43,20 @@ export default function CreateCategoryPage() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
-                body: JSON.stringify({ name }),
+                body: JSON.stringify({
+                    name,
+                    description: description || null,
+                    meta_title: metaTitle || null,
+                    meta_description: metaDescription || null,
+                }),
             });
-
             const result = await res.json();
 
             if (!res.ok) {
                 throw new Error(result.message || 'Gagal membuat kategori');
             }
 
-            alert('Kategori berhasil dibuat!');
-            
-            // Redirect kembali ke halaman list kategori (kita akan buat setelah ini)
+            toast.success('Kategori berhasil dibuat!');
             // Atau jika belum ada, bisa ke dashboard utama
             router.push('/categories'); 
             router.refresh();
@@ -103,6 +109,70 @@ export default function CreateCategoryPage() {
                                 </span>
                             </p>
                         )}
+                    </div>
+
+                    {/* Input Deskripsi Kategori */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Deskripsi Kategori
+                        </label>
+                        <textarea
+                            rows={3}
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="Deskripsi singkat mengenai jenis produk dalam kategori ini..."
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-black"
+                        />
+                        <p className="mt-1 text-xs text-gray-400">Deskripsi kategori untuk katalog dan informasi pelanggan.</p>
+                    </div>
+
+                    {/* Section SEO Kategori */}
+                    <div className="border-t border-gray-100 pt-5 space-y-4">
+                        <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                            <span>🔍</span> Pengaturan SEO Kategori
+                        </h2>
+
+                        {/* Meta Title */}
+                        <div>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Meta Title (Judul Halaman di Google)
+                                </label>
+                                <span className={`text-xs ${metaTitle.length > 60 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                                    {metaTitle.length} / 60 karakter
+                                </span>
+                            </div>
+                            <input
+                                type="text"
+                                value={metaTitle}
+                                onChange={(e) => setMetaTitle(e.target.value)}
+                                placeholder="Contoh: Koleksi Sprei Katun Bali Mewah | Ameskara"
+                                maxLength={60}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-black"
+                            />
+                            <p className="mt-1 text-xs text-gray-400">Judul spesifik untuk halaman kategori di hasil pencarian Google.</p>
+                        </div>
+
+                        {/* Meta Description */}
+                        <div>
+                            <div className="flex items-center justify-between mb-1">
+                                <label className="block text-sm font-medium text-gray-700">
+                                    Meta Description (Deskripsi di Google)
+                                </label>
+                                <span className={`text-xs ${metaDescription.length > 160 ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                                    {metaDescription.length} / 160 karakter
+                                </span>
+                            </div>
+                            <textarea
+                                rows={3}
+                                value={metaDescription}
+                                onChange={(e) => setMetaDescription(e.target.value)}
+                                placeholder="Deskripsikan koleksi kategori ini secara menarik untuk pengunjung hasil pencarian Google..."
+                                maxLength={160}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-black"
+                            />
+                            <p className="mt-1 text-xs text-gray-400">Ringkasan maksimal 160 karakter yang ditampilkan di bawah judul di Google.</p>
+                        </div>
                     </div>
 
                     {/* Tombol Submit */}

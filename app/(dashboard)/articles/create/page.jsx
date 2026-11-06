@@ -18,11 +18,13 @@ export default function CreateArticlePage() {
     const [formData, setFormData] = useState({
         title: '',
         excerpt: '',
+        status: 'published',
+        meta_title: '',
+        meta_description: '',
         thumbnailFile: null,
         thumbnailPreview: null,
-        content: null, // Ini akan berisi JSON dari Editor.js
+        content: null,
     });
-    
     const [isLoading, setIsLoading] = useState(false);
 
     // Handler Input Teks Biasa
@@ -61,6 +63,9 @@ export default function CreateArticlePage() {
         const data = new FormData();
         data.append('title', formData.title);
         data.append('excerpt', formData.excerpt);
+        data.append('status', formData.status);
+        data.append('meta_title', formData.meta_title || formData.title);
+        data.append('meta_description', formData.meta_description || formData.excerpt);
         
         // Kirim konten editor sebagai string JSON
         if (formData.content) {
@@ -70,9 +75,6 @@ export default function CreateArticlePage() {
         if (formData.thumbnailFile) {
             data.append('thumbnail', formData.thumbnailFile);
         }
-
-        data.append('status', 'published'); // Atau buat dropdown draft/published
-
         try {
             const res = await fetch(`${API_URL}/articles`, {
                 method: 'POST',
@@ -135,6 +137,57 @@ export default function CreateArticlePage() {
                     </div>
                 </div>
 
+                {/* PENGATURAN SEO & STATUS */}
+                <div className="bg-white p-6 rounded-lg shadow space-y-4">
+                    <h2 className="text-lg font-bold text-gray-900 border-b pb-2 flex items-center gap-2">
+                        <span>🔍</span> Pengaturan SEO & Publikasi Google
+                    </h2>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Status Artikel</label>
+                        <select
+                            name="status"
+                            value={formData.status}
+                            onChange={handleChange}
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm bg-white"
+                        >
+                            <option value="published">Tayang Sekarang (Published)</option>
+                            <option value="draft">Simpan Draft (Tidak Muncul di Web)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <label className="block text-sm font-medium text-gray-700">Meta Title (Judul di Google)</label>
+                            <span className="text-xs text-gray-400">{formData.meta_title.length} / 60</span>
+                        </div>
+                        <input
+                            type="text"
+                            name="meta_title"
+                            value={formData.meta_title}
+                            onChange={handleChange}
+                            placeholder="Kosongkan jika ingin sama dengan Judul Artikel..."
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Judul yang muncul di hasil pencarian Google & tab browser.</p>
+                    </div>
+
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <label className="block text-sm font-medium text-gray-700">Meta Description (Deskripsi di Google)</label>
+                            <span className="text-xs text-gray-400">{formData.meta_description.length} / 160</span>
+                        </div>
+                        <textarea
+                            name="meta_description"
+                            rows="2"
+                            value={formData.meta_description}
+                            onChange={handleChange}
+                            placeholder="Kosongkan jika ingin sama dengan Ringkasan (Excerpt)..."
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm"
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Cuplikan teks ringkasan yang menarik klik dari pembaca Google.</p>
+                    </div>
+                </div>
                 {/* AREA EDITOR.JS */}
                 <div className="bg-white p-6 rounded-lg shadow">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Konten Artikel</label>

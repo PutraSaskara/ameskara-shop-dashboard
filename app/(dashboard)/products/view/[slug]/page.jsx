@@ -3,9 +3,8 @@ import ProductDetailClient from '../components/ProductDetailClient';
 
 // Fungsi Fetching Data (Server Side)
 async function getProductBySlug(slug) {
-    const API_KEY = process.env.WEB_API_KEY; 
+    const API_KEY = process.env.WEB_API_KEY || process.env.NEXT_PUBLIC_WEB_API_KEY;
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-    
     try {
         const res = await fetch(`${API_URL}/products/public/${slug}`, {
              method: 'GET',

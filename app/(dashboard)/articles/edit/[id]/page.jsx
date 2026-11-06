@@ -23,6 +23,8 @@ export default function EditArticlePage() {
         title: '',
         excerpt: '',
         status: 'draft',
+        meta_title: '',
+        meta_description: '',
         thumbnailFile: null,
         thumbnailPreview: null,
         content: null, 
@@ -50,6 +52,8 @@ export default function EditArticlePage() {
                     title: data.title,
                     excerpt: data.excerpt || '',
                     status: data.status,
+                    meta_title: data.meta_title || '',
+                    meta_description: data.meta_description || '',
                     thumbnailPreview: data.thumbnail, // URL dari server
                     thumbnailFile: null,
                     content: data.content // Simpan konten untuk form state
@@ -104,7 +108,8 @@ export default function EditArticlePage() {
         data.append('title', formData.title);
         data.append('excerpt', formData.excerpt);
         data.append('status', formData.status);
-        
+        data.append('meta_title', formData.meta_title || formData.title);
+        data.append('meta_description', formData.meta_description || formData.excerpt);
         if (formData.content) {
             data.append('content', JSON.stringify(formData.content));
         }
@@ -191,6 +196,44 @@ export default function EditArticlePage() {
                     </div>
                 </div>
 
+                {/* PENGATURAN SEO */}
+                <div className="bg-white p-6 rounded-lg shadow space-y-4">
+                    <h2 className="text-lg font-bold text-gray-900 border-b pb-2 flex items-center gap-2">
+                        <span>🔍</span> Pengaturan SEO Google
+                    </h2>
+
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <label className="block text-sm font-medium text-gray-700">Meta Title (Judul di Google)</label>
+                            <span className="text-xs text-gray-400">{(formData.meta_title || '').length} / 60</span>
+                        </div>
+                        <input
+                            type="text"
+                            name="meta_title"
+                            value={formData.meta_title}
+                            onChange={handleChange}
+                            placeholder="Kosongkan jika ingin sama dengan Judul Artikel..."
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm text-black"
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Judul yang muncul di hasil pencarian Google & tab browser.</p>
+                    </div>
+
+                    <div>
+                        <div className="flex justify-between items-center">
+                            <label className="block text-sm font-medium text-gray-700">Meta Description (Deskripsi di Google)</label>
+                            <span className="text-xs text-gray-400">{(formData.meta_description || '').length} / 160</span>
+                        </div>
+                        <textarea
+                            name="meta_description"
+                            rows="2"
+                            value={formData.meta_description}
+                            onChange={handleChange}
+                            placeholder="Kosongkan jika ingin sama dengan Ringkasan..."
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-2 text-sm text-black"
+                        />
+                        <p className="text-xs text-gray-400 mt-1">Cuplikan teks ringkasan untuk menarik klik dari pembaca Google.</p>
+                    </div>
+                </div>
                 {/* AREA EDITOR.JS */}
                 <div className="bg-white p-6 rounded-lg shadow">
                     <label className="block text-sm font-medium text-gray-700 mb-2">Konten Artikel</label>

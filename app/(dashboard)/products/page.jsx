@@ -34,33 +34,49 @@ function ProductsContent() {
       setEditingId(null);
 
       const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const API_KEY = process.env.NEXT_PUBLIC_WEB_API_KEY; // Pastikan variabel ini ada di .env jika diperlukan
-      console.log("DEBUG: API_URL =", API_URL); // Cek apakah env terbaca
-      console.log("DEBUG: API_KEY =", API_KEY); // Cek apakah env terbaca
+      const API_KEY = process.env.NEXT_PUBLIC_WEB_API_KEY || process.env.WEB_API_KEY;
+      const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
 
       try {
         // 1. Fetch Categories
         const catRes = await fetch(`${API_URL}/categories`);
-        const catData = await catRes.json();
-        setCategories(catData || []);
+        if (catRes.ok) {
+          const catData = await catRes.json();
+          setCategories(catData || []);
+        }
 
-        // 2. Fetch Products
+        // 2. Fetch Products (Utamakan endpoint dashboard ber-token, fallback ke public)
         const params = new URLSearchParams();
         if (query) params.set('search', query);
         if (categoryQuery) params.set('category', categoryQuery);
         params.set('page', page);
         params.set('limit', 10);
 
-        const endpoint = `${API_URL}/products/public?${params.toString()}`;
-        console.log("DEBUG: Fetching URL =", endpoint); // Cek URL lengkap
+        const endpoint = token
+          ? `${API_URL}/products/dashboard?${params.toString()}`
+          : `${API_URL}/products/public?${params.toString()}`;
+
+        const reqHeaders = { 'Content-Type': 'application/json' };
+        if (token) {
+          reqHeaders['Authorization'] = `Bearer ${token}`;
+        }
+        if (API_KEY) {
+          reqHeaders['X-Api-Key'] = API_KEY;
+        }
 
         const prodRes = await fetch(endpoint, {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json', 'X-Api-Key': API_KEY || '' },
+          headers: reqHeaders,
           cache: 'no-store'
         });
 
-        console.log("DEBUG: Response Status =", prodRes.status); // Cek status code (200, 404, 500?)
+        if (prodRes.status === 401) {
+          localStorage.removeItem('admin_token');
+          localStorage.removeItem('admin_role');
+          document.cookie = 'admin_token=; path=/; max-age=0; SameSite=Lax';
+          router.replace('/login');
+          return;
+        }
 
         if (prodRes.ok) {
           const prodJson = await prodRes.json();

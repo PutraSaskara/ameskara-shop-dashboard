@@ -7,11 +7,11 @@ export default function LogoutButton() {
     const router = useRouter();
 
     const handleLogout = () => {
-        // Hapus token dan redirect
+        // Hapus token, role, dan cookie lalu redirect
         if (typeof window !== 'undefined') {
             localStorage.removeItem('admin_token');
             localStorage.removeItem('admin_role');
-            // Menggunakan router.replace untuk membersihkan riwayat navigasi
+            document.cookie = 'admin_token=; path=/; max-age=0; SameSite=Lax';
             router.replace('/login'); 
         }
     };

@@ -15,8 +15,7 @@ const getStatusBadge = (status) => {
 // Helper Fetch Data
 async function getArticles(search = '', page = 1) {
     const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-    const API_KEY = process.env.WEB_API_KEY; // Jika pakai middleware API Key
-    // Atau ambil token dari cookie server-side jika pakai protect (Untuk server component agak tricky ambil token,
+    const API_KEY = process.env.WEB_API_KEY || process.env.NEXT_PUBLIC_WEB_API_KEY;
     // tapi karena ini dashboard yang dilindungi middleware di layout, kita asumsikan fetch client side atau 
     // untuk sementara kita pakai public fetch dulu jika backend mengizinkan, 
     // TAPI karena endpoint dashboard kita protect, kita butuh token).
@@ -64,7 +63,10 @@ function ArticlesContent() {
                 });
 
                 if (res.status === 401) {
-                    router.push('/login');
+                    localStorage.removeItem('admin_token');
+                    localStorage.removeItem('admin_role');
+                    document.cookie = 'admin_token=; path=/; max-age=0; SameSite=Lax';
+                    router.replace('/login');
                     return;
                 }
 

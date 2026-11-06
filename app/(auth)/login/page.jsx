@@ -1,18 +1,26 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function LoginPage() {
+function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   
   const API_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-  // console.log('API_URL:', API_URL);
 
+  useEffect(() => {
+    const token = localStorage.getItem('admin_token');
+    if (token) {
+      document.cookie = `admin_token=${token}; path=/; max-age=86400; SameSite=Lax`;
+      const redirectTo = searchParams.get('from') || '/products';
+      router.replace(redirectTo);
+    }
+  }, [router, searchParams]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -33,13 +41,15 @@ export default function LoginPage() {
 
       const { token, role } = await res.json();
       
-      // Simpan token dan role di Local Storage
+      // Simpan token dan role di Local Storage dan Cookie untuk Route Guard
       if (typeof window !== 'undefined') {
         localStorage.setItem('admin_token', token);
         localStorage.setItem('admin_role', role);
+        document.cookie = `admin_token=${token}; path=/; max-age=86400; SameSite=Lax`;
       }
       
-      router.push('/products'); // Arahkan ke halaman produk setelah login
+      const redirectTo = searchParams.get('from') || '/products';
+      router.push(redirectTo); // Arahkan ke halaman tujuan setelah login
     } catch (err) {
       // Menangani error dengan lebih sederhana di JSX
       setError(err.message || 'Terjadi kesalahan tidak dikenal.');
@@ -85,5 +95,13 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-100" />}>
+      <LoginForm />
+    </Suspense>
   );
 }
